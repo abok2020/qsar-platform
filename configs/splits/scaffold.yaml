@@ -1,0 +1,5 @@
+name: scaffold
+type: scaffold
+n_folds: 5
+holdout_fraction: 0.2
+seed: 42

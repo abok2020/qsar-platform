@@ -1,0 +1,5 @@
+name: weighted_avg
+task: classification
+method: performance_weighted_average
+metric_for_weighting: pr_auc
+temperature_calibration: true

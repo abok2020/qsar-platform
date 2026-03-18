@@ -1,0 +1,24 @@
+stages:
+  ingest:
+    cmd: python -m qsar_platform.cli ingest --input data/raw/assay.csv --output data/interim/ingested.parquet
+    deps:
+      - data/raw/assay.csv
+      - src/qsar_platform/cli.py
+    outs:
+      - data/interim/ingested.parquet
+
+  standardize:
+    cmd: python -m qsar_platform.cli standardize --config configs/data/standardization.yaml
+    deps:
+      - data/interim/ingested.parquet
+      - configs/data/standardization.yaml
+    outs:
+      - data/processed/standardized.parquet
+
+  split:
+    cmd: python -m qsar_platform.cli split --config configs/splits/scaffold.yaml
+    deps:
+      - data/processed/standardized.parquet
+      - configs/splits/scaffold.yaml
+    outs:
+      - data/splits/folds.parquet

@@ -1,0 +1,12 @@
+project:
+  name: qsar-platform
+  random_seed: 42
+
+active:
+  dataset_config: configs/data/assay_binary.yaml
+  split_config: configs/splits/scaffold.yaml
+  base_models:
+    - configs/models/ecfp_xgb.yaml
+    - configs/models/desc_lgbm.yaml
+    - configs/models/hf_embed_xgb.yaml
+  ensemble_config: configs/ensemble/weighted_avg.yaml

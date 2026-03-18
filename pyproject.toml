@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qsar-platform"
+version = "0.1.0"
+description = "Production-oriented SAR/QSAR ensemble platform scaffold"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "pandas>=2.2",
+  "numpy>=1.26",
+  "scikit-learn>=1.5",
+  "xgboost>=2.1",
+  "lightgbm>=4.5",
+  "pydantic>=2.8",
+  "typer>=0.12",
+  "fastapi>=0.115",
+  "uvicorn>=0.30",
+  "mlflow>=2.16",
+  "pyyaml>=6.0",
+  "prometheus-client>=0.20",
+  "transformers>=4.44",
+  "torch>=2.4",
+  "pyarrow>=17.0"
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.3", "ruff>=0.6", "mypy>=1.11"]
+train = ["dvc>=3.57"]
+chem = ["rdkit"]
+
+[project.scripts]
+qsar-platform = "qsar_platform.cli:app"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
