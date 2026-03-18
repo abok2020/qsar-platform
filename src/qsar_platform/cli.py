@@ -28,6 +28,23 @@ def split(config: str) -> None:
     cfg = yaml.safe_load(Path(config).read_text())
     typer.echo(f"Loaded split config: {cfg.get('name', 'split')}")
 
+@app.command("train-desc")
+def train_desc(input: str, output: str = "data/oof/desc_oof.parquet"):
+    import pandas as pd
+    from pathlib import Path
+    from qsar_platform.training.train_descriptors import train_descriptor_model
+
+    df = pd.read_parquet(input)
+    oof, auc = train_descriptor_model(df)
+
+    df["desc_lgbm_oof"] = oof
+
+    Path(output).parent.mkdir(parents=True, exist_ok=True)
+    df.to_parquet(output, index=False)
+
+    print(f"[DESC] AUC: {auc:.4f}")
+    print(f"Saved to {output}")
+
 @app.command("train-model")
 def train_model(config: str) -> None:
     """Placeholder single-model training stage."""
@@ -65,6 +82,21 @@ def fit_ensemble(config: str) -> None:
     """Placeholder ensemble fitting stage."""
     cfg = yaml.safe_load(Path(config).read_text())
     typer.echo(f"Fitting ensemble: {cfg.get('name', 'ensemble')}")
+
+@app.command("ensemble-oof")
+def ensemble_oof(
+    ecfp_input: str = "data/oof/ecfp_oof.parquet",
+    desc_input: str = "data/oof/desc_oof.parquet",
+    output: str = "data/oof/ensemble_oof.parquet",
+) -> None:
+    from qsar_platform.ensemble.weighted_avg import fit_weighted_average
+
+    fit_weighted_average(
+        ecfp_path=ecfp_input,
+        desc_path=desc_input,
+        output_path=output,
+    )
+
 
 @app.command()
 def evaluate(run_group: str) -> None:
