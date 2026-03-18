@@ -28,4 +28,4 @@ def train_descriptor_model(df):
         oof[valid_idx] = preds
 
     auc = roc_auc_score(y, oof)
-    return oof, auc
+    return oof, auc, n_splits

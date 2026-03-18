@@ -4,9 +4,12 @@ from qsar_platform.models.base import BaseModel
 class DescLGBMModel(BaseModel):
     def __init__(self):
         self.model = lgb.LGBMClassifier(
-            n_estimators=300,
+            n_estimators=50,
             learning_rate=0.05,
-            num_leaves=31
+            num_leaves=31,
+            verbosity=-1,
+            min_data_in_leaf=1,
+            min_data_in_bin=1,
         )
 
     def fit(self, X_train, y_train, X_valid=None, y_valid=None):

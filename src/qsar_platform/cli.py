@@ -33,17 +33,29 @@ def train_desc(input: str, output: str = "data/oof/desc_oof.parquet"):
     import pandas as pd
     from pathlib import Path
     from qsar_platform.training.train_descriptors import train_descriptor_model
+    from qsar_platform.utils.mlflow_utils import (
+        start_run,
+        log_common_params,
+        log_metric,
+        log_artifact,
+    )
 
     df = pd.read_parquet(input)
-    oof, auc = train_descriptor_model(df)
 
-    df["desc_lgbm_oof"] = oof
+    with start_run("train-desc"):
+        oof, auc, n_splits = train_descriptor_model(df)
 
-    Path(output).parent.mkdir(parents=True, exist_ok=True)
-    df.to_parquet(output, index=False)
+        df["desc_lgbm_oof"] = oof
 
-    print(f"[DESC] AUC: {auc:.4f}")
-    print(f"Saved to {output}")
+        Path(output).parent.mkdir(parents=True, exist_ok=True)
+        df.to_parquet(output, index=False)
+
+        log_common_params("desc_lgbm", n_splits, input, output)
+        log_metric("roc_auc", auc)
+        log_artifact(output)
+
+        print(f"[DESC] AUC: {auc:.4f}")
+        print(f"Saved to {output}")
 
 @app.command("train-model")
 def train_model(config: str) -> None:
@@ -58,13 +70,17 @@ def train_ecfp(input: str, output: str = "data/oof/ecfp_oof.parquet") -> None:
     from qsar_platform.training.train_ecfp import train_ecfp_model
 
     df = pd.read_parquet(input)
-    oof, auc = train_ecfp_model(df)
+    oof, auc, n_splits = train_ecfp_model(df)
 
     out_df = df.copy()
     out_df["ecfp_xgb_oof"] = oof
 
     Path(output).parent.mkdir(parents=True, exist_ok=True)
     out_df.to_parquet(output, index=False)
+
+    log_common_params("ecfp_xgb", n_splits, input, output)
+    log_metric("roc_auc", auc)
+    log_artifact(output)
 
     print(f"Training complete")
     print(f"OOF ROC-AUC: {auc:.4f}")
@@ -89,14 +105,23 @@ def ensemble_oof(
     desc_input: str = "data/oof/desc_oof.parquet",
     output: str = "data/oof/ensemble_oof.parquet",
 ) -> None:
+    import mlflow
+    from sklearn.metrics import roc_auc_score
     from qsar_platform.ensemble.weighted_avg import fit_weighted_average
+    from qsar_platform.utils.mlflow_utils import start_run, log_metric, log_artifact
 
-    fit_weighted_average(
-        ecfp_path=ecfp_input,
-        desc_path=desc_input,
-        output_path=output,
-    )
+    with start_run("ensemble-oof"):
+        merged = fit_weighted_average(
+            ecfp_path=ecfp_input,
+            desc_path=desc_input,
+            output_path=output,
+        )
 
+        auc = roc_auc_score(merged["target_value"], merged["ensemble_oof"])
+        mlflow.log_param("model_name", "weighted_avg")
+        mlflow.log_param("base_models", "ecfp_xgb,desc_lgbm")
+        log_metric("roc_auc", auc)
+        log_artifact(output)
 
 @app.command()
 def evaluate(run_group: str) -> None:
@@ -108,3 +133,4 @@ def register(run_id: str) -> None:
 
 if __name__ == "__main__":
     app()
+
