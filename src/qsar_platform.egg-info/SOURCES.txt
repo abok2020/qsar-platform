@@ -1,0 +1,17 @@
+README.md
+pyproject.toml
+src/qsar_platform/__init__.py
+src/qsar_platform/cli.py
+src/qsar_platform.egg-info/PKG-INFO
+src/qsar_platform.egg-info/SOURCES.txt
+src/qsar_platform.egg-info/dependency_links.txt
+src/qsar_platform.egg-info/entry_points.txt
+src/qsar_platform.egg-info/requires.txt
+src/qsar_platform.egg-info/top_level.txt
+src/qsar_platform/contracts/schemas.py
+src/qsar_platform/features/ecfp.py
+src/qsar_platform/models/base.py
+src/qsar_platform/models/ecfp_xgb.py
+src/qsar_platform/serving/api.py
+src/qsar_platform/serving/inference.py
+src/qsar_platform/training/train_ecfp.py

@@ -1,0 +1,62 @@
+Metadata-Version: 2.4
+Name: qsar-platform
+Version: 0.1.0
+Summary: Production-oriented SAR/QSAR ensemble platform scaffold
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: pandas>=2.2
+Requires-Dist: numpy>=1.26
+Requires-Dist: scikit-learn>=1.5
+Requires-Dist: xgboost>=2.1
+Requires-Dist: lightgbm>=4.5
+Requires-Dist: pydantic>=2.8
+Requires-Dist: typer>=0.12
+Requires-Dist: fastapi>=0.115
+Requires-Dist: uvicorn>=0.30
+Requires-Dist: mlflow>=2.16
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: prometheus-client>=0.20
+Requires-Dist: transformers>=4.44
+Requires-Dist: torch>=2.4
+Requires-Dist: pyarrow>=17.0
+Provides-Extra: dev
+Requires-Dist: pytest>=8.3; extra == "dev"
+Requires-Dist: ruff>=0.6; extra == "dev"
+Requires-Dist: mypy>=1.11; extra == "dev"
+Provides-Extra: train
+Requires-Dist: dvc>=3.57; extra == "train"
+Provides-Extra: chem
+Requires-Dist: rdkit; extra == "chem"
+
+# qsar-platform
+
+A production-oriented SAR/QSAR ensemble platform scaffold.
+
+## Included
+- Config-driven project layout
+- CLI skeleton
+- Base model interface
+- FastAPI inference service
+- Pydantic request/response contracts
+- GitHub Actions workflow skeletons
+- Dockerfile
+- pyproject.toml
+
+## Quick start
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -e .[dev,train,chem]
+uvicorn qsar_platform.serving.api:app --reload
+```
+
+## Example commands
+
+```bash
+python -m qsar_platform.cli ingest --input data/raw/assay.csv --output data/interim/ingested.parquet
+python -m qsar_platform.cli standardize --config configs/data/standardization.yaml
+python -m qsar_platform.cli split --config configs/splits/scaffold.yaml
+python -m qsar_platform.cli train-all --params params.yaml
+python -m qsar_platform.cli fit-ensemble --config configs/ensemble/weighted_avg.yaml
+```

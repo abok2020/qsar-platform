@@ -1,0 +1,12 @@
+name: hf_embed_xgb
+task: classification
+feature_set: hf_embeddings
+feature_params:
+  model_name: "seyonec/ChemBERTa-zinc-base-v1"
+  pooling: mean
+  max_length: 128
+model_class: xgboost
+hyperparameters:
+  n_estimators: 400
+  max_depth: 5
+  learning_rate: 0.05

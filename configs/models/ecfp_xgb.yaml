@@ -1,0 +1,11 @@
+name: ecfp_xgb
+task: classification
+feature_set: ecfp
+feature_params:
+  radius: 2
+  n_bits: 2048
+model_class: xgboost
+hyperparameters:
+  n_estimators: 500
+  max_depth: 6
+  learning_rate: 0.05

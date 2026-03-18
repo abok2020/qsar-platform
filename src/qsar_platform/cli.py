@@ -34,6 +34,25 @@ def train_model(config: str) -> None:
     cfg = yaml.safe_load(Path(config).read_text())
     typer.echo(f"Training model: {cfg.get('name', 'unknown_model')}")
 
+@app.command("train-ecfp")
+def train_ecfp(input: str, output: str = "data/oof/ecfp_oof.parquet") -> None:
+    import pandas as pd
+    from pathlib import Path
+    from qsar_platform.training.train_ecfp import train_ecfp_model
+
+    df = pd.read_parquet(input)
+    oof, auc = train_ecfp_model(df)
+
+    out_df = df.copy()
+    out_df["ecfp_xgb_oof"] = oof
+
+    Path(output).parent.mkdir(parents=True, exist_ok=True)
+    out_df.to_parquet(output, index=False)
+
+    print(f"Training complete")
+    print(f"OOF ROC-AUC: {auc:.4f}")
+    print(f"Saved OOF predictions to {output}")
+
 @app.command("train-all")
 def train_all(params: str) -> None:
     """Placeholder multi-model training stage."""
